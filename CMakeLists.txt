@@ -112,6 +112,10 @@ foreach(ui_test test_ui_frames test_ui_lists_data test_ui_input)
         ${KEC_GEN_DIR})
     target_compile_definitions(${ui_test} PRIVATE
         UI_LIB_DIR="${UI_LIB_STAGE}")
+    # host.c (the Fe VM's C primitives) uses libm (pow/sqrtf/fmod). macOS
+    # folds libm into libc, but GNU ld needs it explicitly — link it so the
+    # Linux CI leg links.
+    target_link_libraries(${ui_test} m)
     set_target_properties(${ui_test} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tests")
     add_test(NAME ${ui_test} COMMAND ${ui_test})
