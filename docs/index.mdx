@@ -1,0 +1,62 @@
+---
+title: KN-86 UI
+description: "The KN-86 Deckline UI component kit + screen render engine — the default amber-on-black terminal UI library, authored in KEC Lisp."
+template: splash
+hero:
+  tagline: 'The default UI library for the <a href="https://kn86-deckline.com">KN-86 Deckline</a> — an amber-on-black terminal component kit and a declarative screen render engine, authored in KEC Lisp.'
+  image:
+    alt: KN-86 UI
+    file: ../website/src/assets/kn86-ui-logo.svg
+  actions:
+    - text: Component Kit
+      link: /kn86-ui/component-kit/
+      icon: right-arrow
+      variant: primary
+    - text: Screen DSL
+      link: /kn86-ui/screen-dsl/
+      icon: open-book
+      variant: minimal
+    - text: Source on GitHub
+      link: https://github.com/Kinoshita-Electronics-Consortium/kn86-ui
+      icon: external
+      variant: minimal
+---
+
+```lisp
+;; A screen is data. (ui/draw tree) lays it out and paints it.
+(ui/draw
+ '(screen ()
+    (status-bar (handle "ROOK" cr 2480))
+    (stack (gap 1)
+      (headline  (scale 5 align center) "ICE BREAKER")
+      (subtitle  (scale 2 align center) "INTRUSION     STANDARD LEVEL")
+      (rule ())
+      (text () "The signal drops at 0300. Bring the cutter."))
+    (action-bar () ("EVAL" "accept") ("CDR" "next") ("BACK" "exit"))))
+```
+
+## What this is
+
+`kn86-ui` is the **source of truth** for the KN-86 Deckline's UI. It is two
+things layered:
+
+- **The component kit** — `frames`, `lists`, `data`, `compositing`, `glyphs`,
+  `input`: KEC Lisp components that draw against the nOSh render contract
+  (1024×600 RGB565, 8×8 glyphs integer-scaled, EMBER phosphor). See
+  [Component Kit](/kn86-ui/component-kit/).
+- **The screen render engine** — a declarative screen *tree* (`screen` /
+  `stack` / `row` / `panel` / `text` / `headline` / …) that the engine flows
+  and paints, browser-style. See [Screen DSL](/kn86-ui/screen-dsl/).
+
+It is vendored into its consumers (the nOSh runtime, the SDK, and the launch
+carts) via each consumer's own `sync.sh`. Edit the components here; re-vendor
+downstream.
+
+## Design language
+
+The visual contract — the four-channel single-color discipline, the type
+scale, box drawing, and the screen schema — is in the
+[UI Design Language](/kn86-ui/ui-design-language/),
+[Screen Design Rules](/kn86-ui/screen-design-rules/), and the
+[Character Set](/kn86-ui/character-set/). The canonical ADRs live in the
+[engineering docs](https://kn86-deckline.com).
