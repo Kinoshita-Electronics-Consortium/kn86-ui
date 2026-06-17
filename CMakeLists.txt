@@ -120,3 +120,22 @@ foreach(ui_test test_ui_frames test_ui_lists_data test_ui_input)
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tests")
     add_test(NAME ${ui_test} COMMAND ${ui_test})
 endforeach()
+
+# ---------------------------------------------------------------------------
+# render_screen — DSL preview tool. Loads render/ + ui/ + ui/screen.lsp,
+# evals a screen .lsp (which calls ui/draw), and dumps the real RGB565
+# surface to a PPM. Same renderer + font the panel uses; no SDL.
+# ---------------------------------------------------------------------------
+add_executable(render_screen tools/render_screen.c ${SUBSTRATE_SRCS})
+add_dependencies(render_screen ui_lib_stage)
+target_include_directories(render_screen PRIVATE
+    tests/
+    ${SUBSTRATE}
+    ${KEC_DIR}/kernel
+    ${KEC_DIR}/host
+    ${KEC_DIR}/runtime
+    ${KEC_GEN_DIR})
+target_compile_definitions(render_screen PRIVATE UI_LIB_DIR="${UI_LIB_STAGE}")
+target_link_libraries(render_screen m)
+set_target_properties(render_screen PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/tools")
