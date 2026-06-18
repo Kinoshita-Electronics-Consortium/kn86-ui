@@ -5,18 +5,17 @@ project(kn86_ui C)
 # kn86-ui — the KN-86 Fe component kit (source of truth).
 #
 # This repo owns the ui/ component library (frames, glyphs, compositing,
-# lists, data, input) authored in KEC Lisp against the nOSh render + cell
-# API contract. It is vendored into nOSh / kn86-sdk / kn86-carts via each
+# lists, data, input) authored in KEC Lisp. The components are the
+# deliverable; they are vendored into nOSh / kn86-sdk / kn86-carts via each
 # consumer's own sync.sh.
 #
-# Standalone CI builds the components against a FROZEN render substrate
-# shim (vendor/nosh-substrate/) so this repo can prove the kit green
-# without the full nOSh runtime existing yet. The shim's source flips from
-# the kn86-deckline monorepo to the standalone nOSh repo in P4 — see
-# vendor/nosh-substrate/sync.sh.
-#
-# The component sources themselves (ui/*.lsp) are the deliverable; the
-# substrate is build scaffolding only.
+# kn86-ui is a KEC-Lisp library: its ONE dependency is kec-lisp (the Fe VM),
+# vendored under vendor/kec-lisp/. To prove the components green headless,
+# the repo also carries its OWN small render harness (harness/) — an
+# in-memory implementation of the render/* + cell-* contract the components
+# draw through, so the golden-buffer tests can read the surface back. The
+# harness is kn86-ui's test scaffolding, NOT a copy of the nOSh runtime;
+# this repo depends on nothing from nOSh.
 #
 
 set(CMAKE_C_STANDARD 11)
@@ -26,8 +25,8 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 add_compile_options(-Wall -Wextra)
 
-set(SUBSTRATE ${CMAKE_SOURCE_DIR}/vendor/nosh-substrate)
-set(KEC_DIR ${SUBSTRATE}/kec-lisp)
+set(HARNESS ${CMAKE_SOURCE_DIR}/harness)
+set(KEC_DIR ${CMAKE_SOURCE_DIR}/vendor/kec-lisp)
 
 # ---------------------------------------------------------------------------
 # Vendored kec-lisp (the Fe VM the components run on). Same codegen the
@@ -65,31 +64,31 @@ set(FE_SRC
     ${KEC_GEN_DIR}/kec_core_embed.h)
 
 # ---------------------------------------------------------------------------
-# The render substrate the headless component tests link (no SDL3). These
+# The render harness the headless component tests link (no SDL3). These
 # are the C files sys_context.c (System context lifecycle) +
 # sys_render.c (binds render/* primitives) + render.c / phosphor.c /
 # font.c / cell_api.c (the in-memory render surface the golden buffer reads).
 # ---------------------------------------------------------------------------
-set(SUBSTRATE_SRCS
-    ${SUBSTRATE}/sys_render.c
-    ${SUBSTRATE}/sys_context.c
-    ${SUBSTRATE}/render.c
-    ${SUBSTRATE}/phosphor.c
-    ${SUBSTRATE}/font.c
-    ${SUBSTRATE}/cell_api.c
+set(HARNESS_SRCS
+    ${HARNESS}/sys_render.c
+    ${HARNESS}/sys_context.c
+    ${HARNESS}/render.c
+    ${HARNESS}/phosphor.c
+    ${HARNESS}/font.c
+    ${HARNESS}/cell_api.c
     ${FE_SRC})
 
 # ---------------------------------------------------------------------------
 # Stage the lib tree the golden-buffer harness loads at runtime. ui_golden.h
 # reads "UI_LIB_DIR/render.lsp" + "UI_LIB_DIR/ui/<file>.lsp", so we assemble
-# a build-tree lib dir holding render.lsp (from the substrate) + the ui/
+# a build-tree lib dir holding render.lsp (from the harness) + the ui/
 # component sources, and bake UI_LIB_DIR to it. Keeps the harness header
 # byte-identical to the monorepo's.
 # ---------------------------------------------------------------------------
 set(UI_LIB_STAGE ${CMAKE_BINARY_DIR}/lib)
 add_custom_target(ui_lib_stage ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory ${UI_LIB_STAGE}/ui
-    COMMAND ${CMAKE_COMMAND} -E copy ${SUBSTRATE}/render.lsp ${UI_LIB_STAGE}/render.lsp
+    COMMAND ${CMAKE_COMMAND} -E copy ${HARNESS}/render.lsp ${UI_LIB_STAGE}/render.lsp
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/ui ${UI_LIB_STAGE}/ui
     COMMENT "Staging render.lsp + ui/*.lsp for the golden-buffer harness")
 
@@ -101,11 +100,11 @@ add_custom_target(ui_lib_stage ALL
 # ---------------------------------------------------------------------------
 enable_testing()
 foreach(ui_test test_ui_frames test_ui_lists_data test_ui_input)
-    add_executable(${ui_test} tests/${ui_test}.c ${SUBSTRATE_SRCS})
+    add_executable(${ui_test} tests/${ui_test}.c ${HARNESS_SRCS})
     add_dependencies(${ui_test} ui_lib_stage)
     target_include_directories(${ui_test} PRIVATE
         tests/
-        ${SUBSTRATE}
+        ${HARNESS}
         ${KEC_DIR}/kernel
         ${KEC_DIR}/host
         ${KEC_DIR}/runtime
@@ -126,11 +125,11 @@ endforeach()
 # evals a screen .lsp (which calls ui/draw), and dumps the real RGB565
 # surface to a PPM. Same renderer + font the panel uses; no SDL.
 # ---------------------------------------------------------------------------
-add_executable(render_screen tools/render_screen.c ${SUBSTRATE_SRCS})
+add_executable(render_screen tools/render_screen.c ${HARNESS_SRCS})
 add_dependencies(render_screen ui_lib_stage)
 target_include_directories(render_screen PRIVATE
     tests/
-    ${SUBSTRATE}
+    ${HARNESS}
     ${KEC_DIR}/kernel
     ${KEC_DIR}/host
     ${KEC_DIR}/runtime

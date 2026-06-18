@@ -9,7 +9,7 @@
 ; that is the capability boundary working as designed (capability is the
 ; binding-set; kec-lisp-language-standard §2.1/§5).
 ;
-; Authoritative substrate: src/sys_render.c binds the 10 render/*
+; Authoritative harness: src/sys_render.c binds the 10 render/*
 ; primitives (clear, text, glyph, fill-rect, box, bitmap, present, poll,
 ; width, height) into the context this file loads into
 ; (nosh_system_context_create, src/sys_context.c). These wrappers add the

@@ -2,7 +2,7 @@ MIT License
 
 Copyright (c) 2026 Kinoshita Electronics Consortium
 
-The Fe Kernel vendored under vendor/nosh-substrate/kec-lisp/kernel/ (fe.c,
+The Fe Kernel vendored under vendor/kec-lisp/kernel/ (fe.c,
 fe.h) is originally from rxi/fe and is Copyright (c) 2020 rxi, also under the
 MIT License, with small documented KEC modifications. See the kec-lisp repo
 for details.

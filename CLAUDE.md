@@ -25,8 +25,8 @@ The components are **pure Fe-Lisp**. They render through nOSh's privileged
 `render/*` and `cell-*` primitives, which exist only in a System-tier KEC
 context (loading the kit into a cart context raises "unbound symbol" by
 design — that is the capability boundary working). They are tested through a
-small C harness that **vendors the render substrate** (see Layout) so the kit
-can prove itself green headless, without the full device stack.
+small **in-repo render harness** (`harness/`, see Layout) that implements that
+contract, so the kit can prove itself green headless with nothing but kec-lisp.
 
 ## System context
 
@@ -41,27 +41,28 @@ Do not restate that map here; link to it.
 
 This repo's place in it:
 
-- It **vendors a frozen render-substrate shim** (plus a vendored `kec-lisp`) under
-  `vendor/nosh-substrate/` purely so standalone CI can build and test the
-  components before the nOSh runtime exists as its own repo. The shim is build
-  scaffolding, **not** a deliverable.
+- Its **one dependency is `kec-lisp`** (the Fe VM), vendored under `vendor/kec-lisp/`.
+  To prove the components green headless it also carries its **own render harness**
+  (`harness/`) — an in-memory implementation of the `render/*` + `cell-*` contract.
+  The harness is build scaffolding owned by this repo: **not** a deliverable, and
+  **not** a copy of nOSh. This repo depends on nothing from nOSh.
 - It is **consumed by nOSh** (system screens), **kn86-sdk**, and **kn86-carts**,
   which vendor `ui/*.lsp` in via their own `sync.sh` (the same pattern kec-lisp
   uses). Edit components here; re-vendor downstream.
-- It targets **nOSh's render + cell-API contract** — the `render/*` and `cell-*`
+- It targets the **render + cell-API contract** — the `render/*` and `cell-*`
   primitive surface. The components are written against that contract, not
   against any hardware directly.
 
-**The UI design language spec lives in `kn86-docs`** (`ui-design-language.md`).
-Every component header cites it by section (§4 four-channel rule, §6 frames,
-§8 compositing, §10 component kit). When changing component behaviour, the spec
-is the source of truth — read it there, do not paraphrase it into this repo.
+**The UI design language is described in `kn86-docs`** (`ui-design-language.md`).
+Component headers cite it by section for context (§4 four-channel rule, §6 frames,
+§8 compositing, §10 component kit). Those docs are a record of what we built — when
+you change a component, change the code first, then update the docs to match. Docs
+never gate or block a change.
 
-**The canonical hardware spec** (display, grid, glyph set, colour, phosphor
-schemes) lives in `kn86-docs` and the kn86-deckline monorepo `CLAUDE.md`
-("Canonical Hardware Specification — SINGLE SOURCE OF TRUTH"). **Never restate
-those values here** — reference them. If a value in this repo contradicts the
-canonical spec, the spec wins; fix the value, do not fork it.
+**Hardware values** (display, grid, glyph set, colour, phosphor schemes) are listed
+for reference in `kn86-docs` and the kn86-deckline monorepo `CLAUDE.md`. They follow
+the build; if a value here and one there disagree, the working code wins — fix
+whichever is stale, no sign-off needed.
 
 ## Build / test
 
@@ -93,7 +94,7 @@ tests/
   test_ui_frames.c      frames + chrome + compositing
   test_ui_lists_data.c  lists + data
   test_ui_input.c       nav + input
-vendor/nosh-substrate/  FROZEN render-substrate shim (build scaffolding, NOT a deliverable)
+harness/                kn86-ui's OWN render harness (build scaffolding, NOT a deliverable)
   sys_render.{c,h}      binds the render/* primitives
   sys_context.{c,h}     System-tier KEC context lifecycle
   render.{c,h}          in-memory RGB565 render surface
@@ -101,16 +102,15 @@ vendor/nosh-substrate/  FROZEN render-substrate shim (build scaffolding, NOT a d
   font.{c,h}            8x8 KN-86 Code Page glyph bitmaps
   cell_api.{c,h}        the cell-* primitive surface
   render.lsp            System-tier Fe wrapper lib the harness loads
-  kec-lisp/             vendored Fe VM (has its own sync.sh)
-  sync.sh               re-vendors the substrate; records the source commit
+vendor/kec-lisp/        THE ONE DEPENDENCY — vendored Fe VM (has its own sync.sh)
 CMakeLists.txt          builds the embed tool, stages the lib tree, defines the tests
 ```
 
-**`vendor/` is vendored, not authored.** Do not hand-edit files under
-`vendor/nosh-substrate/` (including `kec-lisp/`) to fix a component problem — they
-are a frozen copy of upstream. Re-sync them via the appropriate `sync.sh` and
-update the recorded source commit. Substrate source is the kn86-deckline monorepo
-today; it flips to the standalone nOSh repo in P4 (see the `sync.sh` header).
+**`vendor/kec-lisp/` is vendored, not authored.** Don't hand-edit it to fix a
+component problem — it's a copy of the kec-lisp repo. Re-sync via its `sync.sh`
+and update the recorded source commit. The `harness/` tree, by contrast, **is**
+authored here — it's kn86-ui's own test scaffolding for the render contract, not
+a vendored copy of anything.
 
 ## Conventions
 
@@ -125,21 +125,22 @@ writing):
 - **Name glyph + colour codes once** as `UI-…` `define` constants in
   `ui/glyphs.lsp`; reference them by name in component sources so the code reads
   as intent, never as a magic number. Cross-check codes against the canonical
-  character set and `vendor/nosh-substrate/font.c`.
+  character set and `harness/font.c`.
 - Author in **KEC Core vocabulary** (`defn` / `let` / `cond` / `when` / `do` /
   `dolist` / `dotimes` / `map` / `fold-left` / `floor` / `str` …). KEC uses `set`
   for assignment and `=` / `is` for equality (the kec-lisp migration) — **not**
-  the legacy `setq`/`eq`. See `vendor/nosh-substrate/kec-lisp/core/*.lsp`.
+  the legacy `setq`/`eq`. See `vendor/kec-lisp/core/*.lsp`.
 - Comments are `;` line comments. Lead each public function with a comment giving
   its signature and a one-line contract (the `(ui/foo a b) -> nil` form), and
   cite the governing `ui-design-language.md` section.
 - **Coordinate convention** (`sys_render.h`): `render/box` + `render/glyph` take
   CELL coords; `render/text` + `render/fill-rect` take PIXEL coords. Components are
   cell-addressed and convert (`* cell 8`) at the pixel seam.
-- **The §4 four-channel rule is non-negotiable**: identity = glyph,
+- **The §4 four-channel design intent** (how the kit currently works): identity = glyph,
   magnitude = density, selection = **inversion** (a black-on-phosphor colour pair,
-  never a second colour), attention = border weight / leading-glyph column / blink.
-  There is only ever one foreground hue.
+  not a second colour), attention = border weight / leading-glyph column / blink.
+  One foreground hue throughout. Change it if you want a different look — this just
+  describes what's there now.
 
 **Git / PR workflow:** branch off freshly-fetched `main`; conventional-commit
 messages; open a PR rather than pushing to `main`. CI must be green (both OS legs)
