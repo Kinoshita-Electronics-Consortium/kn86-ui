@@ -116,21 +116,21 @@ static fe_Object *lisp_yield(fe_Context *ctx, fe_Object *args) {
  * cart-tier (get-aesthetic-mode) (nosh_lisp_bridge.c) but is sourced from
  * phosphor.c — the system context has no SystemState. The cycle primitive
  * is system-tier ONLY (carts never mutate the mode): it advances
- * EMBER -> WHITE -> GREEN -> EMBER, sets it live (recolours the surface on
+ * AMBER -> WHITE -> GREEN -> AMBER, sets it live (recolours the surface on
  * the next frame), and persists it to nosh-config.toml [aesthetic].mode.
  */
 
 /* The roster cycle order (ADR-0036 §Decision item 7). */
 static PhosphorScheme phosphor_next(PhosphorScheme s) {
     switch (s) {
-        case PHOSPHOR_EMBER: return PHOSPHOR_WHITE;
+        case PHOSPHOR_AMBER: return PHOSPHOR_WHITE;
         case PHOSPHOR_WHITE: return PHOSPHOR_GREEN;
         case PHOSPHOR_GREEN:
-        default:             return PHOSPHOR_EMBER;
+        default:             return PHOSPHOR_AMBER;
     }
 }
 
-/* (get-aesthetic-mode) -> :ember | :white | :green
+/* (get-aesthetic-mode) -> :amber | :white | :green
  * The active phosphor scheme as a keyword symbol (ADR-0036 amendment of
  * ADR-0034). Read-only; matches the cart-tier primitive's return contract
  * so a screen can share code across tiers. */
@@ -139,7 +139,7 @@ static fe_Object *lisp_get_aesthetic_mode(fe_Context *ctx, fe_Object *args) {
     return fe_symbol(ctx, phosphor_active_symbol());
 }
 
-/* (cycle-aesthetic-mode! path) -> :ember | :white | :green
+/* (cycle-aesthetic-mode! path) -> :amber | :white | :green
  * Advance the active scheme to the next in the roster, apply it live
  * (phosphor_set), and persist to the TOML at `path`. `path` is an optional
  * string; nil / absent uses the device default config path. Returns the new

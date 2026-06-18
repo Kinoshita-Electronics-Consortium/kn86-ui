@@ -143,7 +143,7 @@
 ;   Cycle through a small enum on one row: `LABEL: A > B > C`, the option
 ;   matching `current` inverted (the §4 selection channel). `options` is a
 ;   list of strings; `current` is the selected option string. The SYS-tab
-;   aesthetic-picker primitive (MODE: EMBER > WHITE > GREEN).
+;   aesthetic-picker primitive (MODE: AMBER > WHITE > GREEN).
 (defn ui/cycler (cx cy label current options)
   (render/text (* cx 8) (* cy 8) 1 UI-LIT (str label ": "))
   (let col (+ cx (string-length label) 2))

@@ -125,8 +125,8 @@ const SHELL = /* html */ `<!doctype html><html><head><meta charset="utf-8">
  .rec.on{border-color:var(--amber);color:var(--amber)}
  .rec:hover{border-color:var(--amber)}
  .stage{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;
-   background:radial-gradient(ellipse at center,rgba(216,72,16,.06),#000 70%);overflow:auto}
- .device{border:1px solid var(--dim);background:#000;box-shadow:0 0 40px rgba(216,72,16,.10);position:relative;line-height:0;width:100%;max-width:1024px}
+   background:radial-gradient(ellipse at center,rgba(230, 160, 32,.06),#000 70%);overflow:auto}
+ .device{border:1px solid var(--dim);background:#000;box-shadow:0 0 40px rgba(230, 160, 32,.10);position:relative;line-height:0;width:100%;max-width:1024px}
  .device img{display:block;width:100%;height:auto;image-rendering:pixelated}
  .device::after{content:"";position:absolute;inset:0;pointer-events:none;
    background:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0 2px,rgba(0,0,0,.16) 2px 3px)}

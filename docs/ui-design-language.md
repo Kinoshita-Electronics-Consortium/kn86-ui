@@ -11,7 +11,7 @@ Extracted from [kn86-docs](https://kn86-deckline.com), the canonical engineering
 **Status:** Draft v0.1 — design doc / working spec, for Josh review + iteration. Not yet an ADR. Companion to [ADR-0036](../adr/ADR-0036-native-framebuffer-renderer.md) (the renderer decision this doc cashes out) and to the [Fe-Lisp Runtime Architecture draft](fe-lisp-runtime-architecture.md) (PR #75) §5 `ui/` row (the library this doc specifies).
 **Date:** 2026-06-13
 **Author:** PM / Architect (grounded against the on-glass session against the production `deckline` prototype)
-**Extends:** [ADR-0036](../adr/ADR-0036-native-framebuffer-renderer.md) (native framebuffer renderer + EMBER phosphor), [ADR-0034](../adr/ADR-0034-aesthetic-mode-mechanism.md) (aesthetic-mode roster — pending the ADR-0036 amendment to `EMBER / WHITE / GREEN`), [ADR-0033](../adr/ADR-0033-reveal-noshapi-primitive.md) (reveal grammar), [`docs/influences/synthesis-batch8.md`](../influences/synthesis-batch8.md) §1–§2 (UI pattern catalog + single-color adaptation), [`docs/software/api-reference/grammars/character-set.md`](../character-set/) (KN-86 Code Page Layer 1 + the ADR-0036 §"Validation reference" custom-glyph extension)
+**Extends:** [ADR-0036](../adr/ADR-0036-native-framebuffer-renderer.md) (native framebuffer renderer + AMBER phosphor), [ADR-0034](../adr/ADR-0034-aesthetic-mode-mechanism.md) (aesthetic-mode roster — pending the ADR-0036 amendment to `AMBER / WHITE / GREEN`), [ADR-0033](../adr/ADR-0033-reveal-noshapi-primitive.md) (reveal grammar), [`docs/influences/synthesis-batch8.md`](../influences/synthesis-batch8.md) §1–§2 (UI pattern catalog + single-color adaptation), [`docs/software/api-reference/grammars/character-set.md`](../character-set/) (KN-86 Code Page Layer 1 + the ADR-0036 §"Validation reference" custom-glyph extension)
 **Ratification path:** this draft becomes an ADR once the §10 component-kit signatures and the §11 screen-spec schema are confirmed against the workbench's first emitted screens. Until then it is the working contract every screen the workbench emits is built against.
 
 ---
@@ -46,11 +46,11 @@ The aesthetic-mode axis is **foreground phosphor color** — a per-session choic
 
 | Scheme | Hex | RGB565 | Role |
 |---|---|---|---|
-| **EMBER** | `#D84810` | `0xDA42` | **Canonical default.** Warmer than the retired AMBER; on-glass selected 2026-06-13. |
+| **AMBER** | `#E6A020` | `0xE504` | **Canonical default.** Warmer than the retired AMBER; on-glass selected 2026-06-13. |
 | **WHITE** | `#F0F0F0` | `0xF79E` | Alternate. P4-style phosphor. **Starting value pending on-glass tuning** (§12 OQ-1). |
 | **GREEN** | `#33F033` | `0x3FE6` | Alternate. P1-style phosphor. **Starting value pending on-glass tuning** (§12 OQ-1). |
 
-The background is fixed `0x0000` (true black). One foreground hue is active per session; the operator picks via the SYS-tab cycler (per the picker contract in [`bare-deck-terminal.md`](../software/runtime/bare-deck-terminal.md) §"TAB 4: SYS") and the choice persists to `/home/shared/nosh-config.toml`. Carts read the active scheme via `(get-aesthetic-mode) → :ember | :white | :green` per ADR-0036's amendment of ADR-0034.
+The background is fixed `0x0000` (true black). One foreground hue is active per session; the operator picks via the SYS-tab cycler (per the picker contract in [`bare-deck-terminal.md`](../software/runtime/bare-deck-terminal.md) §"TAB 4: SYS") and the choice persists to `/home/shared/nosh-config.toml`. Carts read the active scheme via `(get-aesthetic-mode) → :amber | :white | :green` per ADR-0036's amendment of ADR-0034.
 
 **Hard constraints, no exceptions:**
 
@@ -409,7 +409,7 @@ Components are listed by domain. Each row: signature, one-line purpose, the Batc
 | **`form`** | `(form cx cy cw fields focused-field)` | Multi-field input panel. Each field has a label + an inline editor; focused field inverted; TAB cycles fields. | [chronos](../influences/inspiration/chronos.md) (Huh-library form panel), [`synthesis-batch8.md`](../influences/synthesis-batch8.md) §1.4 |
 | **`dial`** | `(dial cx cy cw ch value min max)` | Continuous-control widget — a circular indicator with value readout. Drawn via half-block sub-pixels. | Toneline cluster, [`synthesis-batch8.md`](../influences/synthesis-batch8.md) §1.4 |
 | **`slider`** | `(slider cx cy cw value min max)` | Continuous-control widget — a horizontal bar with cursor position. | Toneline cluster |
-| **`cycler`** | `(cycler cx cy label current options)` | Single-row cycle through a small enum (e.g., `MODE: EMBER › WHITE › GREEN`). Inverted on focus. The SYS-tab aesthetic-picker primitive. | [Fe-Lisp Runtime Architecture draft](fe-lisp-runtime-architecture.md) §6 worked example (b) |
+| **`cycler`** | `(cycler cx cy label current options)` | Single-row cycle through a small enum (e.g., `MODE: AMBER › WHITE › GREEN`). Inverted on focus. The SYS-tab aesthetic-picker primitive. | [Fe-Lisp Runtime Architecture draft](fe-lisp-runtime-architecture.md) §6 worked example (b) |
 
 ### 10.6 Headlines + emphasis
 
@@ -468,7 +468,7 @@ SCREEN  <name>
   ```
   The layout reference fixes the panels' coordinates; the schema then binds named panels to components.
 
-- **`phosphor`** — `inherits` (the screen uses the operator's persisted aesthetic-mode choice) or `locked` (a screen pins a specific scheme, e.g., the SYS-tab aesthetic-picker locks to `EMBER` regardless of current setting so the operator can see the default). Default is `inherits`.
+- **`phosphor`** — `inherits` (the screen uses the operator's persisted aesthetic-mode choice) or `locked` (a screen pins a specific scheme, e.g., the SYS-tab aesthetic-picker locks to `AMBER` regardless of current setting so the operator can see the default). Default is `inherits`.
 
 - **`overlays`** — list of overlay specifications, anchored to coordinates or to anchors (the cursor, a panel, a specific row). Each overlay spec names one of the §9 patterns (`palette`, `popup`, `dialog`) and specifies when it's mounted (which key trigger, which event). Overlays are not always-on; they mount and unmount under the handlers' control.
 
@@ -539,7 +539,7 @@ The schema is the structural spec; §10 is the implementation. Every name in `co
 
 ## 12. Open questions
 
-1. **WHITE / GREEN exact hexes (§3).** EMBER `#D84810` is locked (on-glass selected). WHITE `#F0F0F0` and GREEN `#33F033` are starting values pending on-glass tuning — every monitor and panel slightly shifts the actual phosphor read; the production prototype is the only reference that matters and a follow-up tuning session will fix the alternates. Until then the starting values ship.
+1. **WHITE / GREEN exact hexes (§3).** AMBER `#E6A020` is locked (on-glass selected). WHITE `#F0F0F0` and GREEN `#33F033` are starting values pending on-glass tuning — every monitor and panel slightly shifts the actual phosphor read; the production prototype is the only reference that matters and a follow-up tuning session will fix the alternates. Until then the starting values ship.
 
 2. **Big-glyph font at scale 4+ (§5).** At scales above 3×, the 8×8 source character reads as a coarse lo-fi sprite. Three options:
    - **(a)** Ship the integer-scaled 8×8 as the canonical big-glyph (lo-fi by design — the device aesthetic carries it).
@@ -556,7 +556,7 @@ Once these three are resolved, this draft becomes an ADR and the §10 component 
 
 ## 13. References
 
-**Anchoring specs:** [ADR-0036](../adr/ADR-0036-native-framebuffer-renderer.md) (native framebuffer renderer + EMBER phosphor — the renderer this doc draws onto), [ADR-0034](../adr/ADR-0034-aesthetic-mode-mechanism.md) (aesthetic-mode mechanism — pending ADR-0036 amendment to `EMBER / WHITE / GREEN`), [ADR-0033](../adr/ADR-0033-reveal-noshapi-primitive.md) + [`reveal-styles.md`](../software/api-reference/grammars/reveal-styles.md) (reveal grammar), [`character-set.md`](../character-set/) (KN-86 Code Page Layer 1; the ADR-0036 §"Validation reference" custom-glyph extension adds vbars `0x96–0x9D` and hbars `0xA8–0xAE`), [`fe-lisp-runtime-architecture.md`](fe-lisp-runtime-architecture.md) (the §5 `ui/` row this doc cashes out).
+**Anchoring specs:** [ADR-0036](../adr/ADR-0036-native-framebuffer-renderer.md) (native framebuffer renderer + AMBER phosphor — the renderer this doc draws onto), [ADR-0034](../adr/ADR-0034-aesthetic-mode-mechanism.md) (aesthetic-mode mechanism — pending ADR-0036 amendment to `AMBER / WHITE / GREEN`), [ADR-0033](../adr/ADR-0033-reveal-noshapi-primitive.md) + [`reveal-styles.md`](../software/api-reference/grammars/reveal-styles.md) (reveal grammar), [`character-set.md`](../character-set/) (KN-86 Code Page Layer 1; the ADR-0036 §"Validation reference" custom-glyph extension adds vbars `0x96–0x9D` and hbars `0xA8–0xAE`), [`fe-lisp-runtime-architecture.md`](fe-lisp-runtime-architecture.md) (the §5 `ui/` row this doc cashes out).
 
 **Pattern sources:** [`docs/influences/synthesis-batch8.md`](../influences/synthesis-batch8.md) §1 (UI pattern catalog), §2 (single-color adaptation), §4 (LISP integration patterns). The Batch 8 entries this doc cites are the entries [`synthesis-batch8.md`](../influences/synthesis-batch8.md) §6 enumerates; this doc names exemplars in-line and leaves the full corpus index to the synthesis.
 

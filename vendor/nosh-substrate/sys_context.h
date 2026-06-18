@@ -56,7 +56,7 @@ void nosh_cell_api_bind(fe_Context *ctx);
 
 /*
  * Bind the system-tier aesthetic-mode glue into `ctx` (GWP-513): the
- * read primitive (get-aesthetic-mode) -> :ember|:white|:green and the
+ * read primitive (get-aesthetic-mode) -> :amber|:white|:green and the
  * system-only mutator (cycle-aesthetic-mode! path) that advances the
  * phosphor roster, applies it live, and persists to nosh-config.toml. Both
  * marshal against phosphor.c. Called by nosh_system_context_create; exposed

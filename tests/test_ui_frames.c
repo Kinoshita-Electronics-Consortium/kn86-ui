@@ -95,10 +95,10 @@ KN86_TEST(status_bar_is_inverted_chrome)
     fe_Context *ctx = kec_fe(S);
     ui_eval(ctx, "(ui/status-bar \"KZN-7A2B\" \"4210\" \"MISSIONS\")");
     /* Scale-2 band, rows 0..15: an inverted field — black glyphs on an
-     * ember band. Past the text the band is the pure ember field; sample
+     * amber band. Past the text the band is the pure amber field; sample
      * far right (x=1000) where no glyph ink lands. */
-    KN86_ASSERT_EQ(render_get_pixel(1000, 0), UI_EMBER);   /* field lit */
-    KN86_ASSERT_EQ(render_get_pixel(1000, 15), UI_EMBER);  /* band is 16 tall */
+    KN86_ASSERT_EQ(render_get_pixel(1000, 0), UI_AMBER);   /* field lit */
+    KN86_ASSERT_EQ(render_get_pixel(1000, 15), UI_AMBER);  /* band is 16 tall */
     KN86_ASSERT_EQ(render_get_pixel(1000, 16), UI_BLACK);  /* just below band */
     /* The text is the inverted pair: black ink exists in the band. */
     int black_in_band = 0;
@@ -115,9 +115,9 @@ KN86_TEST(action_bar_sits_on_bottom_band)
     fe_Context *ctx = kec_fe(S);
     ui_eval(ctx, "(ui/action-bar '((\"EVAL\" . \"accept\") (\"BACK\" . \"exit\")))");
     /* Bottom 16 px band (rows 584..599) is the lit field. Sample far right
-     * (x=1000) past the text, where the band is the pure ember field. */
-    KN86_ASSERT_EQ(render_get_pixel(1000, 584), UI_EMBER);
-    KN86_ASSERT_EQ(render_get_pixel(1000, 599), UI_EMBER);
+     * (x=1000) past the text, where the band is the pure amber field. */
+    KN86_ASSERT_EQ(render_get_pixel(1000, 584), UI_AMBER);
+    KN86_ASSERT_EQ(render_get_pixel(1000, 599), UI_AMBER);
     /* Nothing painted above the band (row 583 untouched). */
     KN86_ASSERT_EQ(render_get_pixel(0, 583), UI_BLACK);
     kec_close(S);
@@ -137,13 +137,13 @@ KN86_TEST(headline_scales_glyph)
     int lit = 0;
     for (int y = 8; y < 8 + 32 && !lit; y++)
         for (int x = 8; x < 8 + 32; x++)
-            if (render_get_pixel(x, y) == UI_EMBER) { lit = 1; break; }
+            if (render_get_pixel(x, y) == UI_AMBER) { lit = 1; break; }
     KN86_ASSERT(lit);
     /* Scaled: a lit pixel exists beyond the 8px (scale-1) cell width. */
     int wide = 0;
     for (int y = 8; y < 40 && !wide; y++)
         for (int x = 20; x < 40; x++)
-            if (render_get_pixel(x, y) == UI_EMBER) { wide = 1; break; }
+            if (render_get_pixel(x, y) == UI_AMBER) { wide = 1; break; }
     KN86_ASSERT(wide);
     kec_close(S);
 }
@@ -185,7 +185,7 @@ KN86_TEST(select_row_inverts_a_span)
     ui_eval(ctx, "(ui/select-row 4 6 5)");
     /* 5 cells at row 6 (cols 4..8) are a solid lit fill. */
     for (int c = 4; c < 9; c++)
-        KN86_ASSERT(ui_cell_solid(c, 6, UI_EMBER));
+        KN86_ASSERT(ui_cell_solid(c, 6, UI_AMBER));
     /* One past the span is black. */
     KN86_ASSERT_EQ(ui_cell_lit_count(9, 6), 0);
     kec_close(S);
@@ -220,7 +220,7 @@ KN86_TEST(shadow_is_black_offset_strips)
     /* Bottom strip: cell row (2+4)=6, cols (2+1)..(2+6) -> a black cell. */
     KN86_ASSERT(ui_cell_solid(4, 6, UI_BLACK));
     /* The frame interior corner (cell 4,3) is untouched (still lit). */
-    KN86_ASSERT(ui_cell_solid(4, 3, UI_EMBER));
+    KN86_ASSERT(ui_cell_solid(4, 3, UI_AMBER));
     kec_close(S);
 }
 

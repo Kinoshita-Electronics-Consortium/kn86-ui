@@ -1,7 +1,7 @@
 /*
  * phosphor.c — Foreground phosphor-hue switch (ADR-0036 §Decision item 7).
  *
- * Owns the EMBER / WHITE / GREEN scheme enum, the canonical RGB565
+ * Owns the AMBER / WHITE / GREEN scheme enum, the canonical RGB565
  * values, the active scheme, runtime switching, and a minimal single-key
  * `[aesthetic].mode` TOML reader/writer. See phosphor.h for the contract.
  *
@@ -14,9 +14,9 @@
 #include <stdio.h>
 #include <string.h>
 
-/* Process-wide active scheme. EMBER is the canonical default until a
+/* Process-wide active scheme. AMBER is the canonical default until a
  * config load or an explicit phosphor_set() changes it. */
-static PhosphorScheme g_active = PHOSPHOR_EMBER;
+static PhosphorScheme g_active = PHOSPHOR_AMBER;
 
 /* ---- Active scheme ---- */
 
@@ -30,9 +30,9 @@ void phosphor_set(PhosphorScheme scheme) {
         case PHOSPHOR_GREEN:
             g_active = scheme;
             break;
-        case PHOSPHOR_EMBER:
+        case PHOSPHOR_AMBER:
         default:
-            g_active = PHOSPHOR_EMBER;
+            g_active = PHOSPHOR_AMBER;
             break;
     }
 }
@@ -41,8 +41,8 @@ uint16_t phosphor_fg_rgb565(PhosphorScheme scheme) {
     switch (scheme) {
         case PHOSPHOR_WHITE:  return PHOSPHOR_RGB565_WHITE;
         case PHOSPHOR_GREEN:  return PHOSPHOR_RGB565_GREEN;
-        case PHOSPHOR_EMBER:
-        default:              return PHOSPHOR_RGB565_EMBER;
+        case PHOSPHOR_AMBER:
+        default:              return PHOSPHOR_RGB565_AMBER;
     }
 }
 
@@ -53,20 +53,20 @@ uint16_t phosphor_active_fg_rgb565(void) {
 /* ---- Name <-> enum ---- */
 
 PhosphorScheme phosphor_from_name(const char *name) {
-    if (name == NULL) return PHOSPHOR_EMBER;
-    if (strcmp(name, "ember") == 0) return PHOSPHOR_EMBER;
+    if (name == NULL) return PHOSPHOR_AMBER;
+    if (strcmp(name, "amber") == 0) return PHOSPHOR_AMBER;
     if (strcmp(name, "white") == 0) return PHOSPHOR_WHITE;
     if (strcmp(name, "green") == 0) return PHOSPHOR_GREEN;
     /* Unknown / wrong-case / empty -> canonical default. */
-    return PHOSPHOR_EMBER;
+    return PHOSPHOR_AMBER;
 }
 
 const char *phosphor_to_name(PhosphorScheme scheme) {
     switch (scheme) {
         case PHOSPHOR_WHITE:  return "white";
         case PHOSPHOR_GREEN:  return "green";
-        case PHOSPHOR_EMBER:
-        default:              return "ember";
+        case PHOSPHOR_AMBER:
+        default:              return "amber";
     }
 }
 
@@ -74,8 +74,8 @@ const char *phosphor_to_symbol(PhosphorScheme scheme) {
     switch (scheme) {
         case PHOSPHOR_WHITE:  return ":white";
         case PHOSPHOR_GREEN:  return ":green";
-        case PHOSPHOR_EMBER:
-        default:              return ":ember";
+        case PHOSPHOR_AMBER:
+        default:              return ":amber";
     }
 }
 
@@ -87,7 +87,7 @@ const char *phosphor_active_symbol(void) {
  *
  * Mirrors the read-rewrite shape of aesthetic_mode.c (ADR-0034) so the
  * on-disk contract is identical; only the accepted value set differs
- * (ember/white/green, the ADR-0036 roster). Not a general TOML parser:
+ * (amber/white/green, the ADR-0036 roster). Not a general TOML parser:
  * scan for the literal `[aesthetic]` header, then the first
  * `mode = "..."` key inside it. */
 
@@ -97,14 +97,14 @@ static const char *skip_ws(const char *p) {
 }
 
 PhosphorScheme phosphor_config_load(const char *path) {
-    if (path == NULL) return PHOSPHOR_EMBER;
+    if (path == NULL) return PHOSPHOR_AMBER;
 
     FILE *f = fopen(path, "r");
-    if (f == NULL) return PHOSPHOR_EMBER; /* missing file -> default */
+    if (f == NULL) return PHOSPHOR_AMBER; /* missing file -> default */
 
     char line[256];
     bool in_aesthetic = false;
-    PhosphorScheme result = PHOSPHOR_EMBER;
+    PhosphorScheme result = PHOSPHOR_AMBER;
     bool found = false;
 
     while (fgets(line, sizeof(line), f) != NULL) {
@@ -145,7 +145,7 @@ PhosphorScheme phosphor_config_load(const char *path) {
         g_active = result;
         return result;
     }
-    return PHOSPHOR_EMBER;
+    return PHOSPHOR_AMBER;
 }
 
 #define PHOSPHOR_TOML_MAX (16 * 1024)
