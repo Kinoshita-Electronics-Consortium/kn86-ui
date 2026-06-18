@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # sync.sh — re-vendor kec-lisp into kn86-ui's substrate shim
-# (vendor/nosh-substrate/kec-lisp/).
+# (vendor/kec-lisp/).
 #
 # kec-lisp is a SEPARATE GitHub repo
 # (Kinoshita-Electronics-Consortium/kec-lisp), checked out as a sibling at
@@ -28,7 +28,7 @@
 #
 # To re-sync to the current kec-lisp main:
 #
-#     ./vendor/nosh-substrate/kec-lisp/sync.sh
+#     ./vendor/kec-lisp/sync.sh
 #
 # then update the recorded commit hash above.
 

@@ -47,13 +47,14 @@ glyph-by-glyph (a golden-buffer harness, `tests/ui_golden.h`).
 
 ## How the standalone build works
 
-The components can't run without the nOSh render substrate (the C that
-binds `render/*` + `cell-*` and the Fe VM they evaluate on). Until the nOSh
-runtime is its own repo, `vendor/nosh-substrate/` carries a **frozen copy**
-of the minimal substrate the tests need:
+kn86-ui is a kec-lisp library. Its **one dependency** is `kec-lisp` (the Fe
+VM), vendored under `vendor/kec-lisp/`. To exercise the components, the tests
+need *some* implementation of the `render/*` + `cell-*` contract they draw
+through — so this repo carries its **own small render harness** under
+`harness/`:
 
 ```
-vendor/nosh-substrate/
+harness/              kn86-ui's own render harness (test scaffolding)
   sys_render.{c,h}    binds the render/* primitives
   sys_context.{c,h}   System-tier KEC context lifecycle
   render.{c,h}        in-memory RGB565 render surface
@@ -61,14 +62,12 @@ vendor/nosh-substrate/
   font.{c,h}          8×8 KN-86 Code Page glyph bitmaps
   cell_api.{c,h}      the cell-* primitive surface
   render.lsp          the System-tier Fe wrapper lib the harness loads
-  kec-lisp/           the vendored Fe VM (has its own sync.sh)
-  sync.sh             re-vendors the substrate; records the source commit
+vendor/kec-lisp/      the one dependency — vendored Fe VM (has its own sync.sh)
 ```
 
-This substrate is **build scaffolding, not a deliverable** — the
-deliverable is `ui/*.lsp`. Its source of truth is the kn86-deckline
-monorepo today; it flips to the standalone nOSh repo in P4. See
-`vendor/nosh-substrate/sync.sh`.
+The harness is **build scaffolding, not a deliverable** — the deliverable is
+`ui/*.lsp`. It is kn86-ui's own code, not a copy of the nOSh runtime; this
+repo depends on nothing from nOSh.
 
 ## License
 

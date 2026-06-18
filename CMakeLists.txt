@@ -5,18 +5,17 @@ project(kn86_ui C)
 # kn86-ui — the KN-86 Fe component kit (source of truth).
 #
 # This repo owns the ui/ component library (frames, glyphs, compositing,
-# lists, data, input) authored in KEC Lisp against the nOSh render + cell
-# API contract. It is vendored into nOSh / kn86-sdk / kn86-carts via each
+# lists, data, input) authored in KEC Lisp. The components are the
+# deliverable; they are vendored into nOSh / kn86-sdk / kn86-carts via each
 # consumer's own sync.sh.
 #
-# Standalone CI builds the components against a FROZEN render substrate
-# shim (vendor/nosh-substrate/) so this repo can prove the kit green
-# without the full nOSh runtime existing yet. The shim's source flips from
-# the kn86-deckline monorepo to the standalone nOSh repo in P4 — see
-# vendor/nosh-substrate/sync.sh.
-#
-# The component sources themselves (ui/*.lsp) are the deliverable; the
-# substrate is build scaffolding only.
+# kn86-ui is a KEC-Lisp library: its ONE dependency is kec-lisp (the Fe VM),
+# vendored under vendor/kec-lisp/. To prove the components green headless,
+# the repo also carries its OWN small render harness (harness/) — an
+# in-memory implementation of the render/* + cell-* contract the components
+# draw through, so the golden-buffer tests can read the surface back. The
+# harness is kn86-ui's test scaffolding, NOT a copy of the nOSh runtime;
+# this repo depends on nothing from nOSh.
 #
 
 set(CMAKE_C_STANDARD 11)
@@ -26,8 +25,8 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 add_compile_options(-Wall -Wextra)
 
-set(SUBSTRATE ${CMAKE_SOURCE_DIR}/vendor/nosh-substrate)
-set(KEC_DIR ${SUBSTRATE}/kec-lisp)
+set(SUBSTRATE ${CMAKE_SOURCE_DIR}/harness)
+set(KEC_DIR ${CMAKE_SOURCE_DIR}/vendor/kec-lisp)
 
 # ---------------------------------------------------------------------------
 # Vendored kec-lisp (the Fe VM the components run on). Same codegen the
