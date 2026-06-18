@@ -52,16 +52,16 @@ This repo's place in it:
   primitive surface. The components are written against that contract, not
   against any hardware directly.
 
-**The UI design language spec lives in `kn86-docs`** (`ui-design-language.md`).
-Every component header cites it by section (§4 four-channel rule, §6 frames,
-§8 compositing, §10 component kit). When changing component behaviour, the spec
-is the source of truth — read it there, do not paraphrase it into this repo.
+**The UI design language is described in `kn86-docs`** (`ui-design-language.md`).
+Component headers cite it by section for context (§4 four-channel rule, §6 frames,
+§8 compositing, §10 component kit). Those docs are a record of what we built — when
+you change a component, change the code first, then update the docs to match. Docs
+never gate or block a change.
 
-**The canonical hardware spec** (display, grid, glyph set, colour, phosphor
-schemes) lives in `kn86-docs` and the kn86-deckline monorepo `CLAUDE.md`
-("Canonical Hardware Specification — SINGLE SOURCE OF TRUTH"). **Never restate
-those values here** — reference them. If a value in this repo contradicts the
-canonical spec, the spec wins; fix the value, do not fork it.
+**Hardware values** (display, grid, glyph set, colour, phosphor schemes) are listed
+for reference in `kn86-docs` and the kn86-deckline monorepo `CLAUDE.md`. They follow
+the build; if a value here and one there disagree, the working code wins — fix
+whichever is stale, no sign-off needed.
 
 ## Build / test
 
@@ -136,10 +136,11 @@ writing):
 - **Coordinate convention** (`sys_render.h`): `render/box` + `render/glyph` take
   CELL coords; `render/text` + `render/fill-rect` take PIXEL coords. Components are
   cell-addressed and convert (`* cell 8`) at the pixel seam.
-- **The §4 four-channel rule is non-negotiable**: identity = glyph,
+- **The §4 four-channel design intent** (how the kit currently works): identity = glyph,
   magnitude = density, selection = **inversion** (a black-on-phosphor colour pair,
-  never a second colour), attention = border weight / leading-glyph column / blink.
-  There is only ever one foreground hue.
+  not a second colour), attention = border weight / leading-glyph column / blink.
+  One foreground hue throughout. Change it if you want a different look — this just
+  describes what's there now.
 
 **Git / PR workflow:** branch off freshly-fetched `main`; conventional-commit
 messages; open a PR rather than pushing to `main`. CI must be green (both OS legs)
