@@ -16,7 +16,7 @@ a **1024×600 RGB565** surface. Glyphs are the **8×8 KN-86 Code Page**
 ([Character Set](/kn86-ui/character-set/)) drawn at integer scale — a glyph at
 scale `s` is `8s × 8s` px. Coordinates: `render/text` + `render/fill-rect`
 take **pixels**; `render/glyph` + `render/box` take **cells**. The default
-phosphor is EMBER `#D84810`.
+phosphor is AMBER `#E6A020`.
 
 ## Files
 

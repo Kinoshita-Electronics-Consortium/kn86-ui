@@ -36,8 +36,8 @@ KN86_TEST(list_selected_row_is_inverted_pair)
         "(ui/list 2 2 16 4 '(\"alpha\" \"beta\") 1 nil)");
     /* row 1 (index 1) is selected: the span (cols 2..17) is filled lit,
      * and the text 'b' is black-on-phosphor (inverted pair). */
-    KN86_ASSERT(ui_cell_solid(2, 3, UI_EMBER));        /* lead column lit */
-    KN86_ASSERT(ui_glyph_inverted(4, 3, 'b'));         /* black-on-ember */
+    KN86_ASSERT(ui_cell_solid(2, 3, UI_AMBER));        /* lead column lit */
+    KN86_ASSERT(ui_glyph_inverted(4, 3, 'b'));         /* black-on-amber */
     /* row 0 is normal: 'a' phosphor-on-black. */
     KN86_ASSERT(ui_glyph_normal(4, 2, 'a'));
     kec_close(S);
@@ -52,8 +52,8 @@ KN86_TEST(list_no_selection_is_a_log_pane)
     ui_eval(ctx, "(ui/list 0 0 32 3 '(\"> a\" \"> b\") nil nil)");
     /* No fully-lit (inverted) cell exists in the rendered rows — every
      * row is phosphor-on-black. Sample the lead column of each row. */
-    KN86_ASSERT(!ui_cell_solid(0, 0, UI_EMBER));
-    KN86_ASSERT(!ui_cell_solid(0, 1, UI_EMBER));
+    KN86_ASSERT(!ui_cell_solid(0, 0, UI_AMBER));
+    KN86_ASSERT(!ui_cell_solid(0, 1, UI_AMBER));
     kec_close(S);
 }
 

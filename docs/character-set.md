@@ -267,7 +267,7 @@ For the Next.js deckline site and the Remotion attract mode pipeline, Press Star
 .kn86-terminal {
     font-family: 'Press Start 2P', monospace;
     font-size: 8px; /* or multiples: 16px, 24px, 32px */
-    color: #D84810; /* EMBER — canonical default per ADR-0036 */
+    color: #E6A020; /* AMBER — canonical default per ADR-0036 */
     background: #000;
 }
 ```

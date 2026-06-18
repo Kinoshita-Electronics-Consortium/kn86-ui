@@ -22,8 +22,8 @@
  * CMake target links sys_render.c + sys_context.c + render.c + phosphor.c
  * + font.c + cell_api.c + the kec stack (no SDL).
  *
- * The phosphor scheme is pinned to EMBER for deterministic golden values;
- * the inverted pair is (black fg, EMBER bg).
+ * The phosphor scheme is pinned to AMBER for deterministic golden values;
+ * the inverted pair is (black fg, AMBER bg).
  */
 
 #ifndef KN86_UI_GOLDEN_H
@@ -45,9 +45,9 @@
 #include <stdio.h>
 #include <string.h>
 
-/* EMBER resolved to RGB565 (ui-design-language.md §3 / phosphor.c). The
+/* AMBER resolved to RGB565 (ui-design-language.md §3 / phosphor.c). The
  * golden values below are all in this hue or black. */
-#define UI_EMBER 0xDA42
+#define UI_AMBER 0xE504
 #define UI_BLACK 0x0000
 
 /* One 1x cell = 8 px. */
@@ -150,14 +150,14 @@ static void ui_load_libs(fe_Context *ctx)
 
 /* --- Harness lifecycle ------------------------------------------------ */
 
-/* Open a fresh System context with the render surface cleared, EMBER
+/* Open a fresh System context with the render surface cleared, AMBER
  * pinned, and the render/ + ui/ libs loaded. Returns the kec_State; the
  * caller closes it with kec_close. */
 static kec_State *ui_open(void)
 {
     cell_api_reset();
     render_init();
-    phosphor_set(PHOSPHOR_EMBER);
+    phosphor_set(PHOSPHOR_AMBER);
     kec_State *S = nosh_system_context_create(ui_arena, UI_ARENA_BYTES);
     KN86_ASSERT_NOT_NULL(S);
     if (S == NULL) return NULL;
@@ -190,13 +190,13 @@ static int ui_glyph_at(int col, int row, uint8_t ch, uint16_t fg, uint16_t bg)
 /* Normal pair: phosphor-on-black. */
 static int ui_glyph_normal(int col, int row, uint8_t ch)
 {
-    return ui_glyph_at(col, row, ch, UI_EMBER, UI_BLACK);
+    return ui_glyph_at(col, row, ch, UI_AMBER, UI_BLACK);
 }
 
 /* Inverted pair: black-on-phosphor (the §4 selection channel). */
 static int ui_glyph_inverted(int col, int row, uint8_t ch)
 {
-    return ui_glyph_at(col, row, ch, UI_BLACK, UI_EMBER);
+    return ui_glyph_at(col, row, ch, UI_BLACK, UI_AMBER);
 }
 
 /* Is the whole 1x cell at (col,row) a solid fill of `color`? Used to

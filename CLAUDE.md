@@ -97,7 +97,7 @@ vendor/nosh-substrate/  FROZEN render-substrate shim (build scaffolding, NOT a d
   sys_render.{c,h}      binds the render/* primitives
   sys_context.{c,h}     System-tier KEC context lifecycle
   render.{c,h}          in-memory RGB565 render surface
-  phosphor.{c,h}        phosphor scheme (EMBER golden values)
+  phosphor.{c,h}        phosphor scheme (AMBER golden values)
   font.{c,h}            8x8 KN-86 Code Page glyph bitmaps
   cell_api.{c,h}        the cell-* primitive surface
   render.lsp            System-tier Fe wrapper lib the harness loads

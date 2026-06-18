@@ -15,7 +15,7 @@
 #     sys_render.c / sys_render.h   binds the render/* primitives
 #     sys_context.c / sys_context.h System-tier KEC context lifecycle
 #     render.c / render.h           in-memory RGB565 render surface
-#     phosphor.c / phosphor.h       phosphor scheme (EMBER golden values)
+#     phosphor.c / phosphor.h       phosphor scheme (AMBER golden values)
 #     font.c / font.h               8x8 KN-86 Code Page glyph bitmaps
 #     cell_api.c / cell_api.h       the cell-* primitive surface
 #     render.lsp                    System-tier Fe wrapper lib the harness loads
