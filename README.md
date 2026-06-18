@@ -13,7 +13,7 @@ The components render against nOSh's **render + cell API contract**: a set
 of privileged `render/*` and `cell-*` primitives bound into a System-tier
 KEC context. They draw to an 8×8 KN-86 Code Page glyph grid on the
 1024×600 RGB565 surface (the 128×75 cell ceiling). None of the device
-hardware is here — just the components and a frozen substrate to test them.
+hardware is here — just the components and its own small render harness to test them.
 
 ## Components
 
